@@ -89,7 +89,7 @@ Listens on dispatched events of the specified type and invokes `callback(data)` 
 ```js
 const subscription = sar.receive('player:play', (data) => {
   console.log('Now playing ' + data.title);
-  somePlayer.play(data.url);
+  somePlayer.play(data.src);
 });
 ```
 
