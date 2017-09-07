@@ -11,11 +11,12 @@
   "keywords": [
     "event",
     "send",
-    "receive",
     "dispatch",
-    "listen",
     "trigger",
     "fire",
+    "receive",
+    "listen",
+    "subscribe",
     "browser"
   ],
   "scripts": {

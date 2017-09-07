@@ -1,10 +1,8 @@
-const defaultTarget = window;
-
-export function send(type, detail, { target = defaultTarget } = {}) {
-  return target.dispatchEvent(new CustomEvent(type, { detail }));
+export function send(type, detail) {
+  return window.dispatchEvent(new CustomEvent(type, { detail }));
 }
 
-export function receive(type, callback, { target = defaultTarget, times = Number.POSITIVE_INFINITY } = {}) {
+export function receive(type, callback, { times = Number.POSITIVE_INFINITY } = {}) {
   let count = 0;
 
   const handler = (event) => {
@@ -16,10 +14,10 @@ export function receive(type, callback, { target = defaultTarget, times = Number
     }
   };
 
-  const cancel = () => target.removeEventListener(type, handler, false);
+  const cancel = () => window.removeEventListener(type, handler, false);
   const received = () => count;
 
-  target.addEventListener(type, handler, false);
+  window.addEventListener(type, handler, false);
 
   return { cancel, received };
 }
