@@ -11,18 +11,23 @@
         color: #333;
       }
 
-      .pass::before, .fail::before {
-        margin: 0 0.2em 0 0;
+      .pass::before, .fail::before, .skip::before {
+        margin: 0 0.3em 0 0;
       }
 
       .pass::before {
-        content: '\2713';
+        content: '\2714';
         color: rgb(50, 200, 50);
       }
 
       .fail::before {
-        content: '\2717';
+        content: '\274C';
         color: rgb(200, 50, 50);
+      }
+
+      .skip::before {
+        content: '\2B1A';
+        color: rgb(183, 165, 0);
       }
     </style>
   </head>
@@ -38,6 +43,7 @@
 
       var assert = {
         equal: function(expected, actual, message) {
+          if (errored) return;
           ran += 1;
 
           if (expected !== actual) {
@@ -49,6 +55,7 @@
         },
 
         ok: function(condition, message) {
+          if (errored) return;
           ran += 1;
 
           if (!condition) {
@@ -96,6 +103,19 @@
         } else {
           result.className = 'pass';
         }
+
+        results.appendChild(result);
+
+        console.log('end');
+        console.log('');
+      }
+
+      function skip(title) {
+        console.log('skip', title);
+
+        var result = document.createElement('div');
+        result.textContent = title;
+        result.className = 'skip';
 
         results.appendChild(result);
 

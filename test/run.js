@@ -13,11 +13,12 @@ nightmare.on('console', function(method, message) {
 
   switch (message) {
     case 'start':
-      test = {
-        title: args[0],
-        errored: false
-      };
+      test = { title: args[0] };
+      tests.push(test);
+      break;
 
+    case 'skip':
+      test = { title: args[0], skipped: true };
       tests.push(test);
       break;
 
@@ -28,11 +29,13 @@ nightmare.on('console', function(method, message) {
 
     case 'end':
       if (test.errored) {
-        console.log(chalk.red('✗ ' + test.title));
-        console.log(chalk.red('--> ' + test.errorMessage));
+        console.log(chalk.red('❌ ' + test.title));
+        console.log('  ⤷ ' + test.errorMessage);
         errored = true;
+      } else if (test.skipped) {
+        console.log(chalk.yellow('⬚ ' + test.title + ' (skipped)'));
       } else {
-        console.log(chalk.green('✓ ' + test.title));
+        console.log(chalk.green('✔ ' + test.title));
       }
       break;
   }
