@@ -1,0 +1,10 @@
+src
+test
+.editorconfig
+.gitignore
+.npmignore
+.travis.yml
+LICENSE.txt
+Makefile
+rollup.config.js
+yarn.lock

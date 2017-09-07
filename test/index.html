@@ -1,0 +1,109 @@
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>send-and-receive tests</title>
+
+    <style>
+      body {
+        font-family: 'Helvetica Neue', Arial, sans-serif;
+        font-weight: 200;
+        color: #333;
+      }
+
+      .pass::before, .fail::before {
+        margin: 0 0.2em 0 0;
+      }
+
+      .pass::before {
+        content: '\2713';
+        color: rgb(50, 200, 50);
+      }
+
+      .fail::before {
+        content: '\2717';
+        color: rgb(200, 50, 50);
+      }
+    </style>
+  </head>
+
+  <body>
+    <main id="results"></main>
+    <div id="fixture"></div>
+    <script src="../dist/umd.js"></script>
+
+    <script>
+      var results = document.querySelector('#results');
+      var el, ran, assertions, errored;
+
+      var assert = {
+        equal: function(expected, actual, message) {
+          ran += 1;
+
+          if (expected !== actual) {
+            console.log('error', 'not equal:', expected, '===', actual, message ? '(' + message + ')' : '');
+            errored = true;
+          } else {
+            console.log('ok');
+          }
+        },
+
+        ok: function(condition, message) {
+          ran += 1;
+
+          if (!condition) {
+            console.log('error', 'not ok:', condition, message ? '(' + message + ')' : '');
+            errored = true;
+          } else {
+            console.log('ok');
+          }
+        }
+      };
+
+      function expect(num) {
+        assertions = num;
+      }
+
+      function it(title, test) {
+        console.log('start', title);
+
+        errored = false;
+        assertions = null;
+        ran = 0;
+
+        el = document.createElement('div');
+        fixture.appendChild(el);
+
+        try {
+          test();
+        } catch (e) {
+          console.log('error', 'spec failure:', e.message);
+          errored = true;
+        }
+
+        fixture.removeChild(el);
+
+        if (!errored && ran !== assertions) {
+          errored = true;
+          console.log('error', 'expected ' + assertions + ' assertions, but ' + ran + ' ran');
+        }
+
+        var result = document.createElement('div');
+        result.textContent = title;
+
+        if ( errored ) {
+          result.className = 'fail';
+        } else {
+          result.className = 'pass';
+        }
+
+        results.appendChild(result);
+
+        console.log('end');
+        console.log('');
+      }
+    </script>
+
+    <script src="specs.js"></script>
+  </body>
+</html>
