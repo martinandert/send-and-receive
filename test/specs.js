@@ -1,38 +1,41 @@
-it('sends and receives', function() {
+const noop = () => {};
+
+it('sends and receives', () => {
   expect(3);
 
   var datas = [];
 
-  sar.receive('my:event', function(data) {
+  sar.receive('my:event', (data) => {
     datas.push(data);
   });
 
   sar.send('my:event', 'hello');
-  sar.send('my:event', Math.PI);
+  sar.send('my:event', { pi: Math.PI });
 
   assert.equal(2, datas.length);
   assert.equal('hello', datas[0]);
-  assert.equal(Math.PI, datas[1]);
+  assert.equal(Math.PI, datas[1].pi);
 });
 
-it('exposes how often it received', function() {
-  expect(1);
+it('exposes how often it received', () => {
+  expect(2);
 
-  var sub = sar.receive('my:event', () => {});
+  var sub = sar.receive('my:event', noop);
+
+  assert.equal(0, sub.received());
 
   sar.send('my:event', 'a');
   sar.send('my:event', 'b');
-  sar.send('my:event', 'c');
 
-  assert.equal(3, sub.received());
+  assert.equal(2, sub.received());
 });
 
-it('can specify how often to receive', function() {
+it('can specify how often to receive', () => {
   expect(4);
 
   var datas = [];
 
-  var sub = sar.receive('my:event', function(data) {
+  var sub = sar.receive('my:event', (data) => {
     datas.push(data);
   }, { times: 2 });
 
@@ -46,12 +49,10 @@ it('can specify how often to receive', function() {
   assert.equal(2, sub.received(), 'was not received twice');
 });
 
-it('exports receiveOnce convenience method', function() {
+it('exports receiveOnce convenience method', () => {
   expect(1);
 
-  var datas = [];
-
-  var sub = sar.receiveOnce('my:event', () => {});
+  var sub = sar.receiveOnce('my:event', noop);
 
   sar.send('my:event', 'a');
   sar.send('my:event', 'b');
@@ -59,10 +60,10 @@ it('exports receiveOnce convenience method', function() {
   assert.equal(1, sub.received());
 });
 
-it('allows cancellation', function() {
+it('allows cancellation', () => {
   expect(1);
 
-  var sub = sar.receive('my:event', () => {});
+  var sub = sar.receive('my:event', noop);
 
   sar.send('my:event', 'a');
   sar.send('my:event', 'b');

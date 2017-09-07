@@ -1,7 +1,7 @@
 {
   "name": "send-and-receive",
   "version": "1.0.0",
-  "description": "Two small helper methods that simplify communication between nodes in different subtrees of the DOM.",
+  "description": "Two small helper methods that simplify communication between nodes in different subtrees of the browser DOM.",
   "main": "dist/cjs.js",
   "module": "dist/esm.js",
   "browser": "dist/umd.js",
