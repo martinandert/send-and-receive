@@ -2,13 +2,13 @@ export function send(type, detail) {
   return dispatchEvent(new CustomEvent(type, { detail }));
 }
 
-export function receive(type, callback, { times = Number.POSITIVE_INFINITY } = {}) {
+export function receive(type, callback, { limit = Number.POSITIVE_INFINITY } = {}) {
   let count = 0;
 
   const handler = (event) => {
-    if (count < times) {
+    if (count < limit) {
       count++;
-      if (count === times) cancel();
+      if (count === limit) cancel();
       callback(event.detail);
     }
   };
@@ -22,7 +22,7 @@ export function receive(type, callback, { times = Number.POSITIVE_INFINITY } = {
 }
 
 export function receiveOnce(type, callback, options = {}) {
-  options.times = 1;
+  options.limit = 1;
 
   return receive(type, callback, options);
 }

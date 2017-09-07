@@ -30,14 +30,14 @@ it('exposes how often it received', () => {
   assert.equal(2, sub.received());
 });
 
-it('can specify how often to receive', () => {
+it('can restrict how often to receive', () => {
   expect(4);
 
   var datas = [];
 
   var sub = sar.receive('my:event', (data) => {
     datas.push(data);
-  }, { times: 2 });
+  }, { limit: 2 });
 
   sar.send('my:event', 'a');
   sar.send('my:event', 'b');

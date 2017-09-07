@@ -100,10 +100,10 @@ subscription.received() //=> returns an integer >= 0
 subscription.cancel() //=> unlistens from the event
 ```
 
-Besides calling `cancel()`, in order to restrict the number of times the event will be received, you can also use the `times` option:
+Besides calling `cancel()`, in order to restrict the number of times the event will be received, you can also use the `limit` option:
 
 ```js
-sar.receive('player:play', callback, { times: 1 });
+sar.receive('player:play', callback, { limit: 1 });
 ```
 
 This auto-cancels listening to the event after it has been received once.
