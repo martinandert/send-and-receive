@@ -6,7 +6,7 @@
 
 Two small helper methods that simplify communication between nodes in different subtrees of the browser DOM.
 
-See it in action in [this little JS Bin demo](https://jsbin.com/rijekotuna/1/edit?js,output) (run with JS enabled).
+See it in action in [this little JS Bin demo](https://jsbin.com/rijekotuna/1/edit?js,output) showing the basics (run with JS enabled). There's also a [more advanced version](https://jsbin.com/tokofivive/1/edit?js,output) available.
 
 Under the hood, `send()` [dispatches](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent) instances of [`CustomEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent), using `window` as the event target. `receive()` simply [listens](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) on `window` for dispatched events.
 
