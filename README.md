@@ -6,11 +6,11 @@
 
 Two small helper methods that simplify communication between nodes in different subtrees of the browser DOM.
 
-See it in action in [this little JS Bin demo](https://jsbin.com/yohuzevadi/1/edit?js,output) (run with JS enabled).
+See it in action in [this little JS Bin demo](https://jsbin.com/rijekotuna/1/edit?js,output) (run with JS enabled).
 
 Under the hood, `send()` [dispatches](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent) instances of [`CustomEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent), using `window` as the event target. `receive()` simply [listens](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) on `window` for dispatched events.
 
-Note: IE 9/10/11 has [only partial support](http://caniuse.com/#search=CustomEvent) for the CustomEvent interface. You can use a polyfill like [krambuhl/custom-event-polyfill](https://github.com/krambuhl/custom-event-polyfill) to fix it.
+Note: IE 9/10/11 has [only partial support](http://caniuse.com/#search=CustomEvent) for the `CustomEvent` interface. You can use a polyfill like [krambuhl/custom-event-polyfill](https://github.com/krambuhl/custom-event-polyfill) to fix it.
 
 
 ## Installation
@@ -94,15 +94,22 @@ const subscription = sar.receive('player:play', (data) => {
 Use the returned object to retrieve some metadata or to cancel receiving further events:
 
 ```js
-subscription.received  //=> How often was the event received?
+subscription.received  //=> How often has the event been received?
 subscription.remaining //=> How many remaining events can it receive?
-subscription.cancelled //=> Did we opt out of receiving further events?
+
+subscription.cancelled //=> Did we completely opt out of receiving further events?
 subscription.cancel()  //=> Unlisten from the event and set cancelled status.
+
+subscription.paused    //=> Did we temporarily stop receiving further events?
+subscription.pause()   //=> Pause listening and set paused status.
+subscription.resume()  //=> Resume listening and unset paused status.
 ```
+
+Note that both `subscription.pause()` and `subscription.resume()` will throw an error if the subscription has been cancelled.
 
 By default, the number of events it can receive is not limited, which means `subscription.remaining` will always return *positive infinity*.
 
-Besides calling `cancel()` in order to stop listening to further events, you can also restrict the number of times the event will be received by supplying the `limit` option:
+Besides calling `subscription.cancel()` in order to stop listening to further events, you can also restrict the number of times the event will be received by supplying the `limit` option:
 
 ```js
 sar.receive('player:play', callback, { limit: 1 });

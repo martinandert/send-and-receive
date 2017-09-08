@@ -84,7 +84,7 @@
         try {
           test();
         } catch (e) {
-          console.log('error', 'spec failure:', e.message);
+          console.log('error', 'spec failure:', e.toString());
           errored = true;
         }
 

@@ -1,20 +1,20 @@
 var noop = () => {};
 
-it('sends and receives', () => {
+it('sends and receives data', () => {
   expect(3);
 
-  var datas = [];
+  var data = [];
 
-  sar.receive('my:event', (data) => {
-    datas.push(data);
+  sar.receive('my:event', (datum) => {
+    data.push(datum);
   });
 
   sar.send('my:event', 'hello');
   sar.send('my:event', { pi: Math.PI });
 
-  assert.equal(2, datas.length);
-  assert.equal('hello', datas[0]);
-  assert.equal(Math.PI, datas[1].pi);
+  assert.equal(2, data.length);
+  assert.equal('hello', data[0]);
+  assert.equal(Math.PI, data[1].pi);
 });
 
 it('exposes how often it received', () => {
@@ -25,8 +25,8 @@ it('exposes how often it received', () => {
   assert.equal(0, sub.received);
   assert.equal(Number.POSITIVE_INFINITY, sub.remaining);
 
-  sar.send('my:event', 'a');
-  sar.send('my:event', 'b');
+  sar.send('my:event');
+  sar.send('my:event');
 
   assert.equal(2, sub.received);
   assert.equal(Number.POSITIVE_INFINITY, sub.remaining);
@@ -41,9 +41,9 @@ it('can restrict how often to receive', () => {
   assert.equal(2, sub.remaining);
   assert.equal(false, sub.cancelled);
 
-  sar.send('my:event', 'a');
-  sar.send('my:event', 'b');
-  sar.send('my:event', 'c');
+  sar.send('my:event');
+  sar.send('my:event');
+  sar.send('my:event');
 
   assert.equal(2, sub.received);
   assert.equal(0, sub.remaining);
@@ -72,14 +72,17 @@ it('throws if passed limit is <= 0', () => {
 });
 
 it('exports receiveOnce convenience method', () => {
-  expect(2);
+  expect(3);
 
   var sub = sar.receiveOnce('my:event', noop);
 
   assert.equal(1, sub.remaining);
 
-  sar.send('my:event', 'a');
-  sar.send('my:event', 'b');
+  sar.send('my:event');
+
+  assert.equal(0, sub.remaining);
+
+  sar.send('my:event');
 
   assert.equal(1, sub.received);
 });
@@ -89,23 +92,67 @@ it('allows cancellation', () => {
 
   var sub = sar.receive('my:event', noop);
 
-  sar.send('my:event', 'a');
-  sar.send('my:event', 'b');
-
-  assert.equal(2, sub.received);
-
   assert.equal(false, sub.cancelled);
+  sar.send('my:event');
+  assert.equal(1, sub.received);
+
   sub.cancel();
+
   assert.equal(true, sub.cancelled);
+  sar.send('my:event');
+  assert.equal(1, sub.received);
+});
 
-  sar.send('my:event', 'c');
-  sar.send('my:event', 'd');
+it('allows pausing and resuming', () => {
+  expect(6);
 
+  var sub = sar.receive('my:event', noop);
+
+  assert.equal(false, sub.paused);
+  sar.send('my:event');
+  assert.equal(1, sub.received);
+
+  sub.pause();
+
+  assert.equal(true, sub.paused);
+  sar.send('my:event');
+  assert.equal(1, sub.received);
+
+  sub.resume();
+
+  assert.equal(false, sub.paused);
+  sar.send('my:event');
   assert.equal(2, sub.received);
 });
 
+it('throws when pausing a cancelled subscription', () => {
+  expect(1);
+
+  var sub = sar.receive('my:event', noop);
+  sub.cancel();
+
+  try {
+    sub.pause();
+  } catch (e) {
+    assert.equal('cannot pause a cancelled subscription', e.message);
+  }
+});
+
+it('throws when resuming a cancelled subscription', () => {
+  expect(1);
+
+  var sub = sar.receive('my:event', noop);
+  sub.cancel();
+
+  try {
+    sub.resume();
+  } catch (e) {
+    assert.equal('cannot resume a cancelled subscription', e.message);
+  }
+});
+
 it('subscription properties are not writable', () => {
-  expect(4);
+  expect(7);
 
   var sub = sar.receive('my:event', noop, { limit: 42 });
 
@@ -121,14 +168,25 @@ it('subscription properties are not writable', () => {
   var c = sub.cancel;
   sub.cancel = () => 'uhoh!';
   assert.equal(c, sub.cancel);
+
+  sub.paused = true;
+  assert.equal(false, sub.paused);
+
+  var p = sub.pause;
+  sub.pause = () => 'uhoh!';
+  assert.equal(p, sub.pause);
+
+  var r = sub.resume;
+  sub.resume = () => 'uhoh!';
+  assert.equal(r, sub.resume);
 });
 
 it('subscription properties are enumerable', () => {
-  expect(5);
+  expect(8);
 
   var sub = sar.receive('my:event', noop);
 
-  assert.equal(4, Object.keys(sub).length);
+  assert.equal(7, Object.keys(sub).length);
 
   var props = {};
 
@@ -140,4 +198,7 @@ it('subscription properties are enumerable', () => {
   assert.ok(props.remaining);
   assert.ok(props.cancelled);
   assert.ok(props.cancel);
+  assert.ok(props.paused);
+  assert.ok(props.pause);
+  assert.ok(props.resume);
 });

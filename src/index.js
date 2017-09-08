@@ -11,6 +11,9 @@ function Subscription(context) {
   defineProperty(this, 'remaining', () => context.remaining);
   defineProperty(this, 'cancelled', () => context.cancelled);
   defineProperty(this, 'cancel', () => context.cancel);
+  defineProperty(this, 'paused', () => context.paused);
+  defineProperty(this, 'pause', () => context.pause);
+  defineProperty(this, 'resume', () => context.resume);
 }
 
 export function send(type, detail) {
@@ -38,12 +41,34 @@ export function receive(type, callback, { limit = Number.POSITIVE_INFINITY } = {
   const context = {
     received: 0,
     remaining: limit,
+
     cancelled: false,
-    cancel: () => {
+    cancel() {
+      if (context.cancelled) return;
       removeEventListener(type, handler, false);
       context.cancelled = true;
-    }
-  }
+    },
+
+    paused: false,
+    pause() {
+      if (context.cancelled) {
+        throw new Error('cannot pause a cancelled subscription');
+      }
+
+      if (context.paused) return;
+      removeEventListener(type, handler, false);
+      context.paused = true;
+    },
+    resume() {
+      if (context.cancelled) {
+        throw new Error('cannot resume a cancelled subscription');
+      }
+
+      if (!context.paused) return;
+      addEventListener(type, handler, false);
+      context.paused = false;
+    },
+  };
 
   addEventListener(type, handler, false);
 
