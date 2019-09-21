@@ -6,7 +6,7 @@ node_js:
 
 env:
   global:
-    - BUILD_TIMEOUT=10000
+    - BUILD_TIMEOUT=60000
 
 addons:
   apt:
