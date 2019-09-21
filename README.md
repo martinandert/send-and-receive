@@ -117,7 +117,7 @@ sar.receive('player:play', callback, { limit: 1 });
 Here, after the event has been received once, it will be auto-cancelled. Furthermore, the subscription's `received` property will have changed from `0` to `1`, and the `remaining` property from `1` to `0`.
 
 
-### sar.receiveOnce (bonus method)
+### sar.receiveOnce
 
 ```ts
 receiveOnce(type: string, callback: (data?: any) => void): Subscription
@@ -132,7 +132,7 @@ sar.receiveOnce('player:play', callback);
 This is semantically the same as the last example above.
 
 
-## sar.create (bonus method no. 2)
+### sar.create
 
 ```ts
 sar.create(type: string): [
