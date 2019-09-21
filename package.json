@@ -4,6 +4,7 @@
   "description": "Two small helper methods that simplify communication between nodes in different subtrees of the browser DOM.",
   "main": "dist/umd.js",
   "module": "dist/esm.js",
+  "types": "index.d.ts",
   "repository": "martinandert/send-and-receive",
   "author": "Martin Andert",
   "license": "MIT",
@@ -21,7 +22,8 @@
   "scripts": {
     "pretest": "yarn bundle",
     "test": "node test/run.js",
-    "build": "yarn bundle && yarn minify",
+    "build": "yarn typings && yarn bundle && yarn minify",
+    "typings": "yarn tsc --declaration --emitDeclarationOnly --outDir .",
     "bundle": "rollup --config",
     "minify": "uglifyjs dist/umd.js --compress --mangle --output dist/umd.min.js"
   },
@@ -30,6 +32,9 @@
     "nightmare": "^3.0.2",
     "rollup": "^1.21.4",
     "rollup-plugin-buble": "^0.19.8",
+    "rollup-plugin-typescript": "^1.0.1",
+    "tslib": "^1.10.0",
+    "typescript": "^3.6.3",
     "uglify-js": "^3.6.0"
   }
 }

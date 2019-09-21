@@ -8,3 +8,4 @@ LICENSE.txt
 Makefile
 rollup.config.js
 yarn.lock
+tsconfig.json

@@ -10,7 +10,7 @@ build::
 	@yarn build
 
 clean::
-	@rm -rf dist
+	@rm -rf dist index.d.ts
 
 release-patch:: clean test build
 	@$(call release,patch)
