@@ -72,10 +72,7 @@ send(type: string, data?: any): void
 Dispatches an event of the specified `type` with the specified `data` (optional).
 
 ```ts
-sar.send('player:play', {
-  src: 'https://example.org/song.mp3',
-  title: 'Example song'
-});
+sar.send('player:play', { src: 'song.mp3' });
 ```
 
 
@@ -89,8 +86,7 @@ Listens on dispatched events of the specified `type` and, when it receives one, 
 
 ```ts
 const subscription = sar.receive('player:play', (data) => {
-  console.log('Now playing ' + data.title);
-  somePlayer.play(data.src);
+  doSomethingWith(data.src);
 });
 ```
 
@@ -158,10 +154,7 @@ const [sendPlay, receivePlay] = create<Song>('player:play');
 export { receivePlay };
 
 // later on (button click, etc.)
-sendPlay({
-  src: 'https://example.org/song.mp3',
-  title: 'Example song'
-});
+sendPlay({ src: 'song.mp3' });
 ```
 
 ```ts
