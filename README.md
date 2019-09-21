@@ -3,6 +3,7 @@
 [![Travis build status](https://img.shields.io/travis/martinandert/send-and-receive/master.svg)](https://travis-ci.org/martinandert/send-and-receive)
 [![no dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)](https://npmjs.com/package/send-and-receive)
 [![license](https://img.shields.io/github/license/martinandert/send-and-receive.svg)](https://github.com/martinandert/send-and-receive/blob/master/LICENSE.txt)
+![TypeScript typings](https://img.shields.io/badge/types-TypeScript-blue.svg)
 
 Two small helper methods that simplify communication between nodes in different subtrees of the browser DOM.
 
@@ -11,6 +12,8 @@ See it in action in [this little JS Bin demo](https://jsbin.com/rijekotuna/1/edi
 Under the hood, `send()` [dispatches](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/dispatchEvent) instances of [`CustomEvent`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent), using `window` as the event target. `receive()` simply [listens](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) on `window` for dispatched events.
 
 Note: IE 9/10/11 has [only partial support](http://caniuse.com/#search=CustomEvent) for the `CustomEvent` interface. You can use a polyfill like [krambuhl/custom-event-polyfill](https://github.com/krambuhl/custom-event-polyfill) to fix it.
+
+Starting with version 1.3, the package includes TypeScript typings.
 
 
 ## Installation
