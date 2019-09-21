@@ -13,7 +13,7 @@ Under the hood, `send()` [dispatches](https://developer.mozilla.org/en-US/docs/W
 
 Note: IE 9/10/11 has [only partial support](http://caniuse.com/#search=CustomEvent) for the `CustomEvent` interface. You can use a polyfill like [krambuhl/custom-event-polyfill](https://github.com/krambuhl/custom-event-polyfill) to fix it.
 
-Starting with version 1.3, the package includes TypeScript typings.
+Starting with version 1.3, the library is written in TypeScript and thus the package includes TypeScript typings.
 
 
 ## Installation
@@ -65,13 +65,13 @@ Here is the complete API reference:
 
 ### sar.send
 
-```js
-send(string event[, any data])
+```ts
+send(type: string, data?: any): void
 ```
 
-Dispatches an event with optional data.
+Dispatches an event of the specified `type` with the specified `data` (optional).
 
-```js
+```ts
 sar.send('player:play', {
   src: 'https://example.org/song.mp3',
   title: 'Example song'
@@ -81,22 +81,22 @@ sar.send('player:play', {
 
 ### sar.receive
 
-```js
-object receive(string event, function callback[, object options])
+```ts
+receive(type: string, callback: (data?: any) => void, options?: { limit: number }): Subscription
 ```
 
-Listens on dispatched events of the specified type and invokes `callback(data)` when it receives one.
+Listens on dispatched events of the specified `type` and, when it receives one, invokes `callback` with the data passed when sending.
 
-```js
+```ts
 const subscription = sar.receive('player:play', (data) => {
   console.log('Now playing ' + data.title);
   somePlayer.play(data.src);
 });
 ```
 
-Use the returned object to retrieve some metadata or to cancel receiving further events:
+Use the returned `Subscription` object to retrieve some metadata or to cancel receiving further events:
 
-```js
+```ts
 subscription.received  //=> How often has the event been received?
 subscription.remaining //=> How many remaining events can it receive?
 
@@ -114,7 +114,7 @@ By default, the number of events it can receive is not limited, which means `sub
 
 Besides calling `subscription.cancel()` in order to stop listening to further events, you can also restrict the number of times the event will be received by supplying the `limit` option:
 
-```js
+```ts
 sar.receive('player:play', callback, { limit: 1 });
 ```
 
@@ -123,17 +123,55 @@ Here, after the event has been received once, it will be auto-cancelled. Further
 
 ### sar.receiveOnce (bonus method)
 
-```js
-object receiveOnce(string event, function callback)
+```ts
+receiveOnce(type: string, callback: (data?: any) => void): Subscription
 ```
 
 A convenience method for the case when you want to receive the event only once.
 
-```js
+```ts
 sar.receiveOnce('player:play', callback);
 ```
 
 This is semantically the same as the last example above.
+
+
+## sar.create (bonus method no. 2)
+
+```ts
+sar.create(type: string): [
+  send(data?: any): void,
+  receive(callback: (data?: any) => void, options?: { limit: number }): Subscription
+]
+```
+
+A convenience method to create both a sender function and a receiver function for the specified `type`.
+
+This is especially useful when coding in TypeScript, as it allows strict-typing the `data`:
+
+```ts
+// a.ts
+import { create } from 'send-and-receive';
+
+const [sendPlay, receivePlay] = create<Song>('player:play');
+
+export { receivePlay };
+
+// later on (button click, etc.)
+sendPlay({
+  src: 'https://example.org/song.mp3',
+  title: 'Example song'
+});
+```
+
+```ts
+// b.ts
+import { receivePlay } from './a.js';
+
+receivePlay((song) => {
+  doSomethingWith(song.src);
+});
+```
 
 
 ## Contributing

@@ -87,6 +87,31 @@ it('exports receiveOnce convenience method', () => {
   assert.equal(1, sub.received);
 });
 
+it('exports create convenience method', () => {
+  expect(3);
+
+  var sendReceive = sar.create('my:event');
+  var send = sendReceive[0];
+  var receive = sendReceive[1];
+
+  var data = [];
+
+  const subscription = receive((datum) => {
+    data.push(datum);
+  });
+
+  send('hello');
+  send({ pi: Math.PI });
+
+  subscription.cancel();
+
+  send(42);
+
+  assert.equal(2, data.length);
+  assert.equal('hello', data[0]);
+  assert.equal(Math.PI, data[1].pi);
+});
+
 it('allows cancellation', () => {
   expect(4);
 

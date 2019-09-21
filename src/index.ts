@@ -32,20 +32,24 @@ function createSubsription(context: Context): Subscription {
   return subscription as Subscription;
 }
 
-export function send(type: string, detail?: any) {
-  return dispatchEvent(new CustomEvent(type, { detail }));
+export function send(type: string, data?: any) {
+  return dispatchEvent(new CustomEvent(type, { detail: data }));
 }
 
-type Callback = (detail: unknown) => void;
+type Callback<T> = (data: T) => void;
 
 interface ReceiveOptions {
-  readonly limit?: number;
+  readonly limit: number;
 }
 
-export function receive(
+const DEFAULT_RECEIVE_OPTIONS: ReceiveOptions = {
+  limit: Number.POSITIVE_INFINITY,
+};
+
+export function receive<T>(
   type: string,
-  callback: Callback,
-  { limit = Number.POSITIVE_INFINITY }: ReceiveOptions = {},
+  callback: Callback<T>,
+  { limit } = DEFAULT_RECEIVE_OPTIONS,
 ): Subscription {
   if (limit <= 0) {
     throw new RangeError('limit must be greater than 0');
@@ -101,6 +105,23 @@ export function receive(
   return createSubsription(context);
 }
 
-export function receiveOnce(type: string, callback: Callback): Subscription {
+export function receiveOnce<T>(type: string, callback: Callback<T>): Subscription {
   return receive(type, callback, { limit: 1 });
+}
+
+type CreateResult<T> = readonly [
+  (data: T) => ReturnType<typeof send>,
+  (callback: Callback<T>, options?: ReceiveOptions) => ReturnType<typeof receive>,
+];
+
+export function create<T>(type: string): CreateResult<T> {
+  return [
+    function createdSend(data) {
+      return send(type, data);
+    },
+
+    function createdReceive(callback, options = DEFAULT_RECEIVE_OPTIONS) {
+      return receive(type, callback, options);
+    },
+  ];
 }
