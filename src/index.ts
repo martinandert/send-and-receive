@@ -16,7 +16,7 @@ interface Context {
   resume: () => void;
 }
 
-type Subscription = Readonly<Context>;
+export type Subscription = Readonly<Context>;
 
 function createSubsription(context: Context): Subscription {
   const subscription = {};
