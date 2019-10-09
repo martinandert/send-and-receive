@@ -166,6 +166,39 @@ receivePlay((song) => {
 });
 ```
 
+Optionally, you can pass a function as the second argument which transforms the arguments passed to `send` into the data structure supplied to the `receive` callback:
+
+```ts
+sar.create(type: string, buildData: (...args: any[]) => any): [
+  send(...args: any[]): void,
+  receive(callback: (data?: any) => void, options?: { limit: number }): Subscription
+]
+```
+
+Example:
+
+```ts
+import { create } from 'send-and-receive';
+
+interface Options {
+  action: "push" | "replace";
+}
+
+const [navigateTo, receiveNavigateTo] = create(
+  "navigate-to",
+  (url: string, options: Options = { action: "push" }) => ({
+    ...options,
+    url,
+  })
+);
+
+// send...
+navigateTo("/foo", { action: "replace" });
+
+// receive...
+receiveNavigateTo(({ url, action }) => history[action](url));
+```
+
 
 ## Contributing
 

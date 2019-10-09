@@ -189,8 +189,8 @@ export function receiveOnce<T>(type: string, callback: Callback<T>): Subscriptio
   return receive(type, callback, { limit: 1 });
 }
 
-type CreateResult<T> = readonly [
-  (data: T) => ReturnType<typeof send>,
+type CreateResult<T, A extends any[] = [T]> = readonly [
+  (...args: A) => ReturnType<typeof send>,
   (callback: Callback<T>, options?: ReceiveOptions) => ReturnType<typeof receive>,
 ];
 
@@ -225,11 +225,40 @@ type CreateResult<T> = readonly [
  * receivePlay((song) => {
  *   doSomethingWith(song.src);
  * });
+ *
+ * @description
+ *
+ * Optionally, you can pass a function as the second argument which
+ * transforms the arguments passed to `send` into the data structure
+ * supplied to the `receive` callback:
+ *
+ * @example
+ *
+ * interface Options {
+ *   action: "push" | "replace";
+ * }
+ *
+ * const [navigateTo, receiveNavigateTo] = create(
+ *   "navigate-to",
+ *   (url: string, options: Options = { action: "push" }) => ({
+ *     ...options,
+ *     url,
+ *   })
+ * );
+ *
+ * // send...
+ * navigateTo("/foo", { action: "replace" });
+ *
+ * // receive...
+ * receiveNavigateTo(({ url, action }) => history[action](url));
  */
-export function create<T>(type: string): CreateResult<T> {
+export function create<T, A extends any[] = [T]>(
+  type: string,
+  buildData: (...args: A) => T = identity,
+): CreateResult<T, A> {
   return [
-    function createdSend(data) {
-      return send(type, data);
+    function createdSend(...args: A) {
+      return send(type, buildData(...args));
     },
 
     function createdReceive(callback, options = DEFAULT_RECEIVE_OPTIONS) {
@@ -237,3 +266,5 @@ export function create<T>(type: string): CreateResult<T> {
     },
   ];
 }
+
+const identity = <T extends any[]>(...args: T): T[0] => args[0];

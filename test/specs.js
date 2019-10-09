@@ -112,6 +112,26 @@ it('exports create convenience method', () => {
   assert.equal(Math.PI, data[1].pi);
 });
 
+it('allow custom data builder for create', () => {
+  expect(2);
+
+  var sendReceive = sar.create('history', function (url, action) {
+    return action + '("' + url + '")';
+  });
+
+  var send = sendReceive[0];
+  var receive = sendReceive[1];
+
+  var data = [];
+
+  receive((datum) => { data.push(datum) });
+
+  send('/foo', 'push');
+
+  assert.equal(1, data.length);
+  assert.equal('push("/foo")', data[0]);
+});
+
 it('allows cancellation', () => {
   expect(4);
 
